@@ -24,94 +24,54 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
+use tool_brickfield\local\areas\core_course\shortname;
+
 defined('MOODLE_INTERNAL') || die;
 
-$functions = [
-    'mod_bigbluebuttonbn_can_join' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\can_join',
-        'methodname'    => 'execute',
-        'description'   => 'Returns information if the current user can join or not.',
-        'type'          => 'read',
-        'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_get_recordings' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\get_recordings',
-        'methodname'    => 'execute',
-        'description'   => 'Returns a list of recordings ready to be processed by a datatable.',
-        'type'          => 'read',
-        'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_get_recordings_to_import' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\get_recordings_to_import',
-        'methodname'    => 'execute',
-        'description'   => 'Returns a list of recordings ready to import to be processed by a datatable.',
-        'type'          => 'read',
-        'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:importrecordings',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_update_recording' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\update_recording',
-        'methodname'    => 'execute',
-        'description'   => 'Update a single recording',
+$functions = array(
+    'mod_bigbluebuttonbn_view_bigbluebuttonbn' => array(
+        'classname'     => 'mod_bigbluebuttonbn_external',
+        'methodname'    => 'view_bigbluebuttonbn',
+        'description'   => 'Trigger the course module viewed event and update the module completion status.',
         'type'          => 'write',
-        'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:managerecordings',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_end_meeting' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\end_meeting',
-        'methodname'    => 'execute',
-        'description'   => 'End a meeting',
-        'type'          => 'write',
-        'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:join',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_completion_validate' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\completion_validate',
-        'methodname'    => 'execute',
-        'description'   => 'Validate completion',
-        'type'          => 'write',
-        'ajax'          => true,
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_meeting_info' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\meeting_info',
-        'methodname'    => 'execute',
-        'description'   => 'Get displayable information on the meeting',
-        'type'          => 'read',
-        'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\get_bigbluebuttonbns_by_courses',
-        'methodname'    => 'execute',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+    'mod_bigbluebuttonbn_get_bigbluebuttonbns_by_courses' => array(
+        'classname'     => 'mod_bigbluebuttonbn_external',
+        'methodname'    => 'get_bigbluebuttonbns_by_courses',
         'description'   => 'Returns a list of bigbluebuttonbns in a provided list of courses, if no list is provided
                             all bigbluebuttonbns that the user can view will be returned.',
         'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-    'mod_bigbluebuttonbn_view_bigbluebuttonbn' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\view_bigbluebuttonbn',
-        'methodname'    => 'execute',
-        'description'   => 'Trigger the course module viewed event and update the module completion status.',
-        'type'          => 'write',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'mod_bigbluebuttonbn_can_join' => array(
+        'classname'     => 'mod_bigbluebuttonbn_external',
+        'methodname'    => 'can_join',
+        'description'   => 'Returns information if the current user can join or not.',
+        'type'          => 'read',
         'capabilities'  => 'mod/bigbluebuttonbn:view',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE]
-    ],
-    'mod_bigbluebuttonbn_get_join_url' => [
-        'classname'     => 'mod_bigbluebuttonbn\external\get_join_url',
-        'methodname'    => 'execute',
-        'description'   => 'Get the join URL for the meeting and create if it does not exist.',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'mod_bigbluebuttonbn_add_bigbluebuttonbn_mcq_question' => array(
+        'classname'     => 'mod_bigbluebuttonbn_external',
+        'methodname'    => 'add_bigbluebuttonbn_mcq_question',
+        'description'   => 'Adds new mcq question in moodle when question is published in bigbluebutton.',
         'type'          => 'write',
-        'capabilities'  => 'mod/bigbluebuttonbn:join',
-        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
-    ],
-];
+        'ajax' => true,
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+);
+
+$services = array(
+    'add_bigbluebutton_mcq_question' => array(
+        'functions' => array(
+            'mod_bigbluebuttonbn_add_bigbluebuttonbn_mcq_question'
+        ),
+        'restrictedusers' => 0,
+        'enabled' => 1,
+        'shortname'=>'bigbluebuttonquestioning'
+    )
+);

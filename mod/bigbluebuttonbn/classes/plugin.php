@@ -14,11 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The mod_bigbluebuttonbn plugin helper.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2019 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ */
+
 namespace mod_bigbluebuttonbn;
+
+use moodle_url;
+use moodle_exception;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class plugin.
- *
  * @package mod_bigbluebuttonbn
  * @copyright 2019 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,37 +45,16 @@ abstract class plugin {
     const COMPONENT = 'mod_bigbluebuttonbn';
 
     /**
-     * Helper function to convert an html string to plain text.
-     *
-     * @param string $html
-     * @param int $len
-     *
+     * Outputs url with plain parameters.
+     * @param  string $url
+     * @param  array $params
+     * @param  string $anchor
      * @return string
+     * @throws \moodle_exception
      */
-    public static function html2text($html, $len = 0) {
-        $text = strip_tags($html);
-        $text = str_replace('&nbsp;', ' ', $text);
-        $textlen = strlen($text);
-        $text = mb_substr($text, 0, $len);
-        if ($textlen > $len) {
-            $text .= '...';
-        }
-        return $text;
+    public static function necurl($url, $params = null, $anchor = null) {
+        $lurl = new moodle_url($url, $params, $anchor);
+        return $lurl->out(false);
     }
 
-    /**
-     * Helper generates a random password.
-     *
-     * @param int $length
-     * @param string $unique
-     *
-     * @return string
-     */
-    public static function random_password($length = 8, $unique = "") {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        do {
-            $password = substr(str_shuffle($chars), 0, $length);
-        } while ($unique == $password);
-        return $password;
-    }
 }

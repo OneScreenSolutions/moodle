@@ -14,18 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Renderer.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
+ */
+
 namespace mod_bigbluebuttonbn\output;
 
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\local\config;
-use mod_bigbluebuttonbn\local\helpers\roles;
 use renderable;
 use renderer_base;
-use stdClass;
 use templatable;
+use html_table;
+use html_writer;
+use stdClass;
+use coding_exception;
+use mod_bigbluebuttonbn\plugin;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
- * Renderable for the import page.
+ * Class import_view
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -33,117 +47,83 @@ use templatable;
  * @author    Darko Miletic  (darko.miletic [at] gmail [dt] com)
  */
 class import_view implements renderable, templatable {
-    /**
-     * @var instance $destinationinstance
-     */
-    protected $destinationinstance;
 
-    /**
-     * @var int|null $sourceinstanceid the source instance id or null if it is not yet set.
-     */
-    protected $sourceinstanceid;
-
-    /**
-     * @var int|null $sourcecourseid the source instance id or null if it is not yet set.
-     */
-    protected $sourcecourseid;
+    /** @var array */
+    private $context = [];
 
     /**
      * import_view constructor.
      *
-     * @param instance $destinationinstance
-     * @param int $sourcecourseid
-     * @param int $sourceinstanceid
+     * @param stdClass $course
+     * @param stdClass $bigbluebuttonbn
+     * @param int $tc
      */
-    public function __construct(instance $destinationinstance, int $sourcecourseid, int $sourceinstanceid) {
-        $this->destinationinstance = $destinationinstance;
-        $this->sourcecourseid = $sourcecourseid >= 0 ? $sourcecourseid : null;
-        $this->sourceinstanceid = $sourceinstanceid >= 0 ? $sourceinstanceid : null;
+    public function __construct($course, $bigbluebuttonbn, $tc) {
+        global $SESSION, $PAGE;
+        $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+        $options = bigbluebuttonbn_import_get_courses_for_select($bbbsession);
+        $selected = isset($options[$tc]) ? $tc : '';
+        $this->context['backactionurl'] = plugin::necurl('/mod/bigbluebuttonbn/view.php');
+        $this->context['cmid'] = $PAGE->cm->id;
+        if (!empty($options)) {
+            $selectoptions = [];
+            $toadd = ['value' => '', 'label' => get_string('choosedots')];
+            if ('' == $tc) {
+                $toadd['selected'] = true;
+            }
+            $selectoptions[] = $toadd;
+            foreach ($options as $key => $option) {
+                $toadd = ['value' => $key, 'label' => $option];
+                if ($key == $tc) {
+                    $toadd['selected'] = true;
+                }
+                $selectoptions[] = $toadd;
+            }
+            $this->context['hascontent'] = true;
+            $this->context['selectoptions'] = $selectoptions;
+            // Get course recordings.
+            $bigbluebuttonbnid = null;
+            if ($course->id == $selected) {
+                $bigbluebuttonbnid = $bigbluebuttonbn->id;
+            }
+            $recordings = bigbluebuttonbn_get_allrecordings(
+                $selected, $bigbluebuttonbnid, false,
+                (boolean) \mod_bigbluebuttonbn\locallib\config::get('importrecordings_from_deleted_enabled')
+            );
+            // Exclude the ones that are already imported.
+            if (!empty($recordings)) {
+                $recordings = bigbluebuttonbn_unset_existent_recordings_already_imported(
+                    $recordings, $course->id, $bigbluebuttonbn->id
+                );
+            }
+            // Store recordings (indexed) in a session variable.
+            $SESSION->bigbluebuttonbn_importrecordings = $recordings;
+            // Proceed with rendering.
+            if (!empty($recordings)) {
+                $this->context['recordings'] = true;
+                $this->context['recordingtable'] = bigbluebuttonbn_output_recording_table($bbbsession, $recordings, ['import']);
+            }
+            // JavaScript for locales.
+            $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+            // Require JavaScript modules.
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-imports', 'M.mod_bigbluebuttonbn.imports.init',
+                array(array('bn' => $bigbluebuttonbn->id, 'tc' => $selected)));
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-broker', 'M.mod_bigbluebuttonbn.broker.init',
+                array());
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings', 'M.mod_bigbluebuttonbn.recordings.init',
+                array(array('hide_table' => true, 'bbbid' => $bigbluebuttonbn->id))
+            );
+        }
     }
 
     /**
      * Defer to template.
      *
      * @param renderer_base $output
-     * @return stdClass
+     * @return array
      */
-    public function export_for_template(renderer_base $output): stdClass {
-        $courses = roles::import_get_courses_for_select($this->destinationinstance);
-        if (config::get('importrecordings_from_deleted_enabled')) {
-            $courses[0] = get_string('recordings_from_deleted_activities', 'mod_bigbluebuttonbn');
-            ksort($courses);
-        }
-        $context = (object) [
-            'bbbid' => $this->destinationinstance->get_instance_id(),
-            'has_recordings' => true,
-            'bbbsourceid' => 0
-        ];
-
-        if (!empty($this->sourceinstanceid)) {
-            $context->sourceid = $this->sourceinstanceid;
-            $context->search = [
-                'value' => ''
-            ];
-            $sourceinstance = instance::get_from_instanceid($this->sourceinstanceid);
-            if ($sourceinstance->is_type_room_only()) {
-                $context->has_recordings = false;
-            }
-            $context->bbbsourceid = $sourceinstance->get_instance_id();
-        }
-
-        // Now the selects.
-        if (!empty($this->sourcecourseid)) {
-            $selectrecords = [];
-
-            $cms = get_fast_modinfo($this->sourcecourseid)->instances['bigbluebuttonbn'];
-            foreach ($cms as $cm) {
-                if ($cm->id == $this->destinationinstance->get_cm_id()) {
-                    // Skip the target instance.
-                    continue;
-                }
-
-                if ($cm->deletioninprogress) {
-                    // Check if the BBB is not currently scheduled for deletion.
-                    continue;
-                }
-
-                $selectrecords[$cm->instance] = $cm->name;
-            }
-            if (config::get('importrecordings_from_deleted_enabled')) {
-                $selectrecords[0] =
-                    get_string('recordings_from_deleted_activities', 'mod_bigbluebuttonbn');
-            }
-            $actionurl = $this->destinationinstance->get_import_url();
-            $actionurl->param('sourcecourseid', $this->sourcecourseid);
-
-            $select = new \single_select(
-                $actionurl,
-                'sourcebn',
-                $selectrecords,
-                $this->sourceinstanceid ?? ""
-            );
-            $context->bbb_select = $select->export_for_template($output);
-        }
-        $context->sourcecourseid = $this->sourcecourseid ?? 0;
-
-        // Course selector.
-        $context->course_select = (new \single_select(
-            $this->destinationinstance->get_import_url(),
-            'sourcecourseid',
-            $courses,
-            $this->sourcecourseid ?? ""
-        ))->export_for_template($output);
-
-        if (!is_null($this->sourcecourseid)) {
-            $context->has_selected_course = true;
-        }
-
-        // Back button.
-        $context->back_button = (new \single_button(
-            $this->destinationinstance->get_view_url(),
-            get_string('view_recording_button_return', 'mod_bigbluebuttonbn')
-        ))->export_for_template($output);
-
-        return $context;
+    public function export_for_template(renderer_base $output) {
+        return $this->context;
     }
+
 }

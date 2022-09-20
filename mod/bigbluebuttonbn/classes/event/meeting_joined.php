@@ -14,10 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The mod_bigbluebuttonbn meeting joined event.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
+
 namespace mod_bigbluebuttonbn\event;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * The mod_bigbluebuttonbn meeting joined event, triggered when the user joins the session.
+ * The mod_bigbluebuttonbn meeting joined event (triggered by bbb_view.php when the user joins the session).
  *
  * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
@@ -28,7 +39,7 @@ class meeting_joined extends base
     /**
      * Init method.
      * @param string $crud
-     * @param int $edulevel
+     * @param integer $edulevel
      */
     protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
         parent::init($crud, $edulevel);
@@ -49,9 +60,9 @@ class meeting_joined extends base
     /**
      * Return objectid mapping.
      *
-     * @return array
+     * @return string
      */
     public static function get_objectid_mapping() {
-        return ['db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn'];
+        return array('db' => 'bigbluebuttonbn', 'restore' => 'bigbluebuttonbn');
     }
 }

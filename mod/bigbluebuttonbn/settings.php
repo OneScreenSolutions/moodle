@@ -26,7 +26,39 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$bbbsettings = new mod_bigbluebuttonbn\settings($ADMIN, $module, $section);
-$bbbsettings->add_all_settings();
+global $CFG;
 
-$settings = null;
+require_once(__DIR__.'/locallib.php');
+
+if ($hassiteconfig) {
+    // Configuration for BigBlueButton.
+    $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
+    // Renders general settings.
+    bigbluebuttonbn_settings_general($renderer);
+    // Evaluates if recordings are enabled for the Moodle site.
+    if (\mod_bigbluebuttonbn\locallib\config::recordings_enabled()) {
+        // Renders settings for record feature.
+        bigbluebuttonbn_settings_record($renderer);
+        // Renders settings for import recordings.
+        bigbluebuttonbn_settings_importrecordings($renderer);
+        // Renders settings for showing recordings.
+        bigbluebuttonbn_settings_showrecordings($renderer);
+    }
+    // Renders settings for meetings.
+    bigbluebuttonbn_settings_waitmoderator($renderer);
+    bigbluebuttonbn_settings_voicebridge($renderer);
+    bigbluebuttonbn_settings_preupload($renderer);
+    bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
+    bigbluebuttonbn_settings_userlimit($renderer);
+    bigbluebuttonbn_settings_duration($renderer);
+    bigbluebuttonbn_settings_participants($renderer);
+    bigbluebuttonbn_settings_notifications($renderer);
+    bigbluebuttonbn_settings_clienttype($renderer);
+    bigbluebuttonbn_settings_muteonstart($renderer);
+    bigbluebuttonbn_settings_locksettings($renderer);
+    bigbluebuttonbn_settings_default_messages($renderer);
+    // Renders settings for extended capabilities.
+    bigbluebuttonbn_settings_extended($renderer);
+    // Renders settings for experimental features.
+    bigbluebuttonbn_settings_experimental($renderer);
+}

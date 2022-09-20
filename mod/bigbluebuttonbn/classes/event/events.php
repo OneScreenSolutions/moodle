@@ -14,12 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The mod_bigbluebuttonbn event/events.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
+ */
+
 namespace mod_bigbluebuttonbn\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
 /**
  * The mod_bigbluebuttonbn class for event name definition.
  *
- * @package   mod_bigbluebuttonbn
  * @copyright 2010 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,9 +41,9 @@ class events {
      * Event name matcher.
      * @var $events
      */
-    public static $events = [
+    public static $events = array(
         'create' => 'activity_created',
-        'view' => 'course_module_viewed',
+        'view' => 'activity_viewed',
         'update' => 'activity_updated',
         'delete' => 'activity_deleted',
         'meeting_create' => 'meeting_created',
@@ -47,5 +59,5 @@ class events {
         'recording_edit' => 'recording_edited',
         'recording_play' => 'recording_viewed',
         'live_session' => 'live_session'
-    ];
+    );
 }

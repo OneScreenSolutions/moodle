@@ -23,44 +23,48 @@
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
-use core\notification;
-use mod_bigbluebuttonbn\instance;
-use mod_bigbluebuttonbn\output\import_view;
 use mod_bigbluebuttonbn\plugin;
+use mod_bigbluebuttonbn\output\import_view;
+use mod_bigbluebuttonbn\output\renderer;
 
-require(__DIR__ . '/../../config.php');
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/locallib.php');
 
-$destbn = required_param('destbn', PARAM_INT);
-$sourcebn = optional_param('sourcebn', -1, PARAM_INT);
-$sourcecourseid = optional_param('sourcecourseid', -1, PARAM_INT);
+$bn = required_param('bn', PARAM_INT);
+$tc = optional_param('tc', 0, PARAM_INT);
 
-$destinationinstance = instance::get_from_instanceid($destbn);
-if (!$destinationinstance) {
+if (!$bn) {
     throw new moodle_exception('view_error_url_missing_parameters', plugin::COMPONENT);
 }
 
-$cm = $destinationinstance->get_cm();
-$course = $destinationinstance->get_course();
+$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $bn], '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $bigbluebuttonbn->course], '*', MUST_EXIST);
+$cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
 
 require_login($course, true, $cm);
 
-if (!(boolean) \mod_bigbluebuttonbn\local\config::importrecordings_enabled()) {
-    notification::add(
-        get_string('view_message_importrecordings_disabled', plugin::COMPONENT),
-        notification::ERROR
-    );
-    redirect($destinationinstance->get_view_url());
+if (!isset($SESSION) || !isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    throw new moodle_exception('view_error_invalid_session', plugin::COMPONENT);
+}
+
+if (!(boolean)\mod_bigbluebuttonbn\locallib\config::importrecordings_enabled()) {
+    throw new moodle_exception('view_message_importrecordings_disabled', plugin::COMPONENT);
 }
 
 // Print the page header.
-$PAGE->set_url($destinationinstance->get_import_url());
-$PAGE->set_title($destinationinstance->get_meeting_name());
+$PAGE->set_url('/mod/bigbluebuttonbn/import_view.php', ['id' => $cm->id, 'bigbluebuttonbn' => $bigbluebuttonbn->id]);
+$PAGE->set_title($bigbluebuttonbn->name);
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 
-/** @var \mod_bigbluebuttonbn\renderer $renderer */
+// View widget must be initialized here in order to properly load javascript.
+$view = new import_view($course, $bigbluebuttonbn, $tc);
+
+/** @var renderer $renderer */
 $renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
-echo $renderer->render(new import_view($destinationinstance, $sourcecourseid, $sourcebn));
+
+echo $renderer->render($view);
+
 echo $OUTPUT->footer();

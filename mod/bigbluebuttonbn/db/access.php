@@ -27,134 +27,73 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
+$capabilities = array(
 
     // Ability to add a new bigbluebuttonbn instance.
-    'mod/bigbluebuttonbn:addinstance' => [
+    'mod/bigbluebuttonbn:addinstance' => array(
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
+        'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        ],
+        ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities',
-    ],
-
-    // Ability to create instances with live meeting capabilities.
-    'mod/bigbluebuttonbn:addinstancewithmeeting' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/course:manageactivities',
-    ],
-
-    // Ability to create instances with recording capabilities.
-    'mod/bigbluebuttonbn:addinstancewithrecording' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/course:manageactivities',
-    ],
+    ),
 
     // Ability to join a meeting.
-    'mod/bigbluebuttonbn:join' => [
+    'mod/bigbluebuttonbn:join' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
+        'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'guest' => CAP_ALLOW,
-        ],
-    ],
+        ),
+    ),
 
-    // Ability to access instances, regardless of the type.
-    'mod/bigbluebuttonbn:view' => [
+    // Ability to manage recordings.
+    'mod/bigbluebuttonbn:managerecordings' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+        ),
+    ),
+
+    // Ability to access instances, regardless of the type.
+    'mod/bigbluebuttonbn:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        ]
-    ],
+        )
+    ),
 
-    // Ability to manage recordings.
-    'mod/bigbluebuttonbn:managerecordings' => [
+    // Ability to create instances with live meeting capabilities.
+    'mod/bigbluebuttonbn:meeting' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
+        'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        ],
-    ],
+        ),
+    ),
 
-    // Ability to publish recordings.
-    'mod/bigbluebuttonbn:publishrecordings' => [
+    // Ability to create instances with recording capabilities.
+    'mod/bigbluebuttonbn:recording' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
+        'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-
-    // Ability to unpublish recordings.
-    'mod/bigbluebuttonbn:unpublishrecordings' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-
-    // Ability to protect recordings.
-    'mod/bigbluebuttonbn:protectrecordings' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-
-    // Ability to unprotect recordings.
-    'mod/bigbluebuttonbn:unprotectrecordings' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-
-    // Ability to delete recordings.
-    'mod/bigbluebuttonbn:deleterecordings' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-
-    // Ability to import recordings.
-    'mod/bigbluebuttonbn:importrecordings' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-    ],
-];
+        ),
+    ),
+);

@@ -648,6 +648,8 @@ class view {
             // No questions on this page. Reset to page 0.
             $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams, 0, $perpage);
         }
+        $records = $DB->get_records('question');
+        echo "<script>console.log('Debug Objects: " . implode(',',$questions) . ", SQL ". json_encode($this->loadsql) ." );</script>";
         return $questions;
     }
 
@@ -988,7 +990,7 @@ class view {
         echo \html_writer::start_tag('fieldset', ['class' => 'invisiblefieldset', 'style' => "display: block;"]);
         echo \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
         echo \html_writer::input_hidden_params($this->baseurl);
-
+        
         $this->display_questions($questions);
 
         $this->display_bottom_pagination($OUTPUT->render($pagingbar), $totalnumber, $perpage, $pageurl);

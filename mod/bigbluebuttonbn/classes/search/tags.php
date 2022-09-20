@@ -14,9 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_bigbluebuttonbn\search;
+/**
+ * Search area for mod_bigbluebuttonbn tags.
+ *
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author    Pablo Pagnone  (pablodp84 [at] gmail [dt] com)
+ */
 
-use stdClass;
+namespace mod_bigbluebuttonbn\search;
+use core_tag\output\tag;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Search area for mod_bigbluebuttonbn tags.
@@ -44,18 +54,19 @@ class tags extends \core_search\base_activity {
      * @param int $modifiedfrom
      * @param \context|null $context
      * @return \moodle_recordset|null
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function get_document_recordset($modifiedfrom = 0, \context $context = null) {
         global $DB;
-        [$contextjoin, $contextparams] = $this->get_context_restriction_sql($context, $this->get_module_name(), 'modtable');
+        list ($contextjoin, $contextparams) = $this->get_context_restriction_sql(
+            $context, $this->get_module_name(), 'modtable');
         if ($contextjoin === null) {
             return null;
         }
 
-        $result = $DB->get_recordset_sql(
-            'SELECT modtable.* FROM {' . $this->get_module_name() .  '} modtable ' . $contextjoin,
-            array_merge($contextparams)
-        );
+        $result = $DB->get_recordset_sql('SELECT modtable.* FROM {' . $this->get_module_name() .
+            '} modtable ' . $contextjoin, array_merge($contextparams));
 
         return($result);
     }
@@ -65,9 +76,9 @@ class tags extends \core_search\base_activity {
      *
      * @param stdClass $record
      * @param array    $options
-     * @return \core_search\document|bool
+     * @return \core_search\document
      */
-    public function get_document($record, $options = []) {
+    public function get_document($record, $options = array()) {
 
         try {
             $cm = $this->get_cm($this->get_module_name(), $record->id, $record->course);
@@ -76,7 +87,7 @@ class tags extends \core_search\base_activity {
             $tags = \core_tag_tag::get_tags_by_area_in_contexts("core", "course_modules", [$context]);
             $tagsstring = "";
             if (!empty($tags)) {
-                $res = [];
+                $res = array();
                 foreach ($tags as $t) {
                     $res[] = $t->name;
                 }
@@ -94,7 +105,7 @@ class tags extends \core_search\base_activity {
             return false;
         }
 
-        // Prepare array with data from DB.
+        // Prepare associative array with data from DB.
         $doc = \core_search\document_factory::instance($record->id, $this->componentname, $this->areaname);
         $doc->set('title', content_to_text($record->name, false));
         $doc->set('content', $tagsstring);

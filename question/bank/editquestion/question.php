@@ -291,6 +291,10 @@ if ($mform->is_cancelled()) {
     if (empty($question->id)) {
         $qtypeobj->save_defaults_for_new_questions($fromform);
     }
+    /////////////////////////////
+    //print_r("Question".(array) $question."form".(array) $fromform);
+    echo "<script>console.log('Debug Objects: " . json_encode($question) . ", SQL ". json_encode($fromform) ." );</script>";
+    //echo "'Debug Objects: ". "Question".(array) $question."form".(array) $fromform ."'";
     $question = $qtypeobj->save_question($question, $fromform);
     if (isset($fromform->tags)) {
         // If we have any question context level tags then set those tags now.
@@ -314,13 +318,13 @@ if ($mform->is_cancelled()) {
     if (!empty($fromform->updatebutton)) {
         $url->param('id', $question->id);
         $url->remove_params('makecopy');
-        redirect($url);
+        // redirect($url);
     }
 
     if ($qtypeobj->finished_edit_wizard($fromform)) {
         if ($inpopup) {
             echo $OUTPUT->notification(get_string('changessaved'), '');
-            close_window(3);
+            // close_window(3);
         } else {
             $returnurl->param('lastchanged', $question->id);
             if ($appendqnumstring) {
@@ -328,7 +332,7 @@ if ($mform->is_cancelled()) {
                 $returnurl->param('sesskey', sesskey());
                 $returnurl->param('cmid', $cmid);
             }
-            redirect($returnurl);
+            // redirect($returnurl);
         }
 
     } else {
@@ -348,7 +352,7 @@ if ($mform->is_cancelled()) {
         } else {
             $nexturl->param('courseid', $COURSE->id);
         }
-        redirect($nexturl);
+        // redirect($nexturl);
     }
 
 }

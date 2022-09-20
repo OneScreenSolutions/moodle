@@ -25,8 +25,7 @@
 
 namespace mod_bigbluebuttonbn\analytics\indicator;
 
-use cm_info;
-use lang_string;
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Social breadth indicator - BigBlueButtonBN.
@@ -42,16 +41,16 @@ class social_breadth extends activity_base {
      *
      * If there is a corresponding '_help' string this will be shown as well.
      *
-     * @return lang_string
+     * @return object
      */
-    public static function get_name(): lang_string {
-        return new lang_string('indicator:socialbreadth', 'mod_bigbluebuttonbn');
+    public static function get_name() : \lang_string {
+        return new \lang_string('indicator:socialbreadth', 'mod_bigbluebuttonbn');
     }
 
     /**
      * Returns the indicator type.
      *
-     * @return string
+     * @return integer
      */
     public function get_indicator_type() {
         return self::INDICATOR_SOCIAL;
@@ -62,9 +61,9 @@ class social_breadth extends activity_base {
      *
      * @param cm_info $cm
      *
-     * @return int
+     * @return integer
      */
-    public function get_social_breadth_level(cm_info $cm) {
+    public function get_social_breadth_level(\cm_info $cm) {
         return self::SOCIAL_LEVEL_1;
     }
 }
